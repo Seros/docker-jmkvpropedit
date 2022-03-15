@@ -1,9 +1,9 @@
-FROM jlesage/baseimage-gui:alpine-3.10
+FROM jlesage/baseimage-gui:alpine-3.15-v3.5.8
 
 # Define software versions.
-ARG JMKVPROPEDIT_VERSION=1.4.3
-ARG MKVTOOLNIX_VERSION=44.0.0
-ARG MEDIAINFO_VERSION=19.09
+ARG JMKVPROPEDIT_VERSION=1.5.2
+ARG MKVTOOLNIX_VERSION=65.0.0
+ARG MEDIAINFO_VERSION=21.09
 
 # Define software download URLs.
 ARG JMKVPROPEDIT_URL=https://github.com/BrunoReX/jmkvpropedit/archive/v${JMKVPROPEDIT_VERSION}.tar.gz
@@ -25,11 +25,16 @@ RUN add-pkg \
         libebml \
         flac \
         qt5-qtmultimedia \
+	qt5-qttranslations \
         mesa-dri-swrast \
-        openjdk7-jre \
+	pcre2 \
+        openjdk8-jre \
         # For MediaInfo
         libmediainfo \
         qt5-qtsvg \
+	libcurl \
+	libzen \
+	tinyxml \
         && \
     add-pkg cmark-dev --repository http://dl-cdn.alpinelinux.org/alpine/edge/community
 
@@ -67,6 +72,7 @@ RUN \
         build-base \
         ruby-rake \
         ruby-json \
+	ruby-rexml \
         qt5-qtbase-dev \
         qt5-qtmultimedia-dev \
         boost-dev \
@@ -78,7 +84,14 @@ RUN \
         libvorbis-dev \
         docbook-xsl \
         gettext-dev \
+	pcre2-dev \
+	gmp-dev \
         && \
+    # Set same default compilation flags as abuild.
+    export CFLAGS="-Os -fomit-frame-pointer" && \
+    export CXXFLAGS="$CFLAGS" && \
+    export CPPFLAGS="$CFLAGS" && \
+    export LDFLAGS="-Wl,--as-needed" && \
 
     # Download the MKVToolNix package.
     echo "Downloading MKVToolNix package..." && \
@@ -110,6 +123,14 @@ RUN \
     add-pkg --virtual build-dependencies \
         build-base \
         curl \
+	cmake \
+	automake \
+	autoconf \
+	libtool \
+	curl-dev \
+	libmms-dev \
+	libzen-dev \
+	tinyxml2-dev \
         qt5-qtbase-dev \
         libmediainfo-dev \
         && \
